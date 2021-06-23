@@ -1,5 +1,5 @@
 <template>
-  <div class="about-card" id="AboutCard">
+  <div class="about-card" id="AboutCard" v-if="this.card.ID">
     <div class="about-card__element">
       <img class="about-card__element__img" :src="card.ImgUrl" alt="Лого картинки" draggable="false">
     </div>
@@ -26,7 +26,11 @@
       <p>Композитор:</p>
       <p>{{this.card.Compositor.CompositorName}} : {{this.card.Compositor.CompositorCountry}}</p>
     </div>
-    <button class="about-card__button" @click="backwards">Назад</button>
+    <div class="button-holder">
+      <button class="typical-button" @click="backwards">Назад</button>
+      <button class="typical-button" v-if="!isInMyPlaylist" @click="addToMyPlaylist">В мой плейлист</button>
+      <button class="typical-button" v-else @click="deleteFromMyPlaylist">Удалить из плейлиста</button>
+    </div>
   </div>
 </template>
 <script>
@@ -35,17 +39,45 @@ export default {
   name: "AboutCard",
   methods: {
     backwards(){
-      this.$router.push("/card-holder")
+      this.$router.push(this.backTo)
     },
+    async addToMyPlaylist(){
+      await this.$store.dispatch('addToMyPlaylist').then(() => this.getMyPlaylist()).then(() => this.$router.push(this.backTo));
+    },
+    async deleteFromMyPlaylist(){
+      await this.$store.dispatch('deleteFromMyPlaylist', this.myPlaylist.find(item => item.CompositionID === this.card.ID).ID).then(() => this.getMyPlaylist()).then(() => this.$router.push(this.backTo));
+    },
+    async getMyPlaylist(){
+      await this.$store.dispatch("loadMyPlaylist")
+    },
+    refreshChecker(){
+      if (!this.card.ID){
+        this.$router.push("/card-holder")
+      }
+    }
   },
   data() {
     return {
       card: this.$store.state.currentCard
     };
   },
+  computed: {
+    isInMyPlaylist(){
+      return this.myPlaylist.find(item => item.CompositionID === this.card.ID) != null;
+    },
+    myPlaylist(){
+      return this.$store.state.myPlaylist.data;
+    },
+    backTo(){
+      return this.$store.state.backTo;
+    }
+  },
+  created() {
+    window.onload = this.refreshChecker;
+  },
 };
 </script>
-<style>
+<style scoped>
 .about-card{
   border-radius: 20px;
   background-color: rgba(0, 0, 0, 0.5);
@@ -57,14 +89,22 @@ export default {
   border: 1px solid black;
   border-radius: 10px;
 }
-.about-card__button{
+.button-holder{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.typical-button{
+  min-width: 150px;
+  width: 20%;
+  height: 55px;
   border: none;
   text-decoration: none;
   outline: none;
   display: inline-block;
   color: white;
   font-weight: bold;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
   padding: 15px 30px;
   margin: 10px 20px;
   border-radius: 10px;
@@ -75,5 +115,12 @@ export default {
 .about-card__element__img{
   width: 190px;
   border-radius: 7px;
+}
+@media (max-width: 700px) {
+  .button-holder{
+    padding-top: 5%;
+    flex-direction: column;
+    gap: 10px;
+  }
 }
 </style>

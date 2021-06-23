@@ -3,11 +3,12 @@
     <div class="nav">
       <router-link class="nav__item" to="/">Главная</router-link>
       <router-link class="nav__item" to="/card-holder"> Каталог </router-link>
-      <router-link class="nav__item" to="/card-holders"> Мой Плейлист </router-link>
+      <router-link class="nav__item" v-if="isLoggedIn" to="/playlist"> Мой Плейлист </router-link>
+      <router-link class="nav__item" v-if="userRole === 'Admin'" to="/admin-place"> Админка </router-link>
       <div class="nav__item auth">
         <router-link class="auth__item" v-if="!isLoggedIn" to="/login"> Войти </router-link>
         <router-link class="auth__item" v-if="!isLoggedIn" to="/register"> Регистрация </router-link>
-        <router-link class="auth__item" v-if="isLoggedIn" @click="logout"> Выйти </router-link>
+        <p class="auth__item" v-if="isLoggedIn" @click="logout"> Выйти </p>
       </div>
     </div>
     <router-view/>
@@ -17,21 +18,45 @@
 export default {
   name: "App",
   created: function () {
+    this.$http.interceptors.response.use(function (response) {
+      return response
+    }, function (error) {
+      let error_json = JSON.stringify(error.response)
+      if (error_json.status === 401) {
+        this.$store.dispatch("logout");
+      }
+      return Promise.reject(error)
+    })
     this.$store.dispatch("loadCompositions");
-    this.$http.interceptors.response.use(undefined, function (err) {
-      // eslint-disable-next-line no-unused-vars
-      return new Promise(function (resolve, reject) {
-        if (err.status === 401 && err.config && !err.config.__isRetryRequest) {
-          this.$store.dispatch("logout");
-        }
-        throw err;
-      });
-    });
+    if (this.isLoggedIn){
+      this.$store.dispatch("loadMyPlaylist");
+    }
+    if (this.userRole === "Admin"){
+      this.$store.dispatch("loadCompositors");
+      this.$store.dispatch("loadGenres");
+      this.$store.dispatch("loadPerformers");
+      this.$store.dispatch("loadRecordCompanies");
+    }
+    if (!this.isTokenValid){
+      this.$store.dispatch("logout");
+    }
   },
   computed: {
     isLoggedIn: function () {
       return this.$store.getters.isLoggedIn;
     },
+    userRole(){
+      return this.$store.getters.userRole || localStorage.getItem("role");
+    },
+    isTokenValid() {
+      let timePasted = new Date().getTime() - new Date(parseInt(localStorage.getItem('loginTime'))).getTime();
+      if (parseInt(Math.floor(timePasted / 1000)) > parseInt(localStorage.getItem('expiresIn'))){
+        return false;
+      }
+      else{
+        return true;
+      }
+    }
   },
   methods: {
     logout: function () {
@@ -51,9 +76,7 @@ export default {
   text-align: center;
 }
 body{
-  background: linear-gradient(0deg, rgba(96, 96, 96, 0.35), rgba(96, 96, 96, 0.35)),
-  conic-gradient(from 183.48deg at 52.06% 50%, #6E00E0 -31.19deg, #661085 46.27deg, #AC4EBE 118.15deg, #F436C9 189.8deg, #FFB461 231.57deg, #6E00E0 328.81deg, #661085 406.27deg),
-  linear-gradient(0deg, #610981, #610981);
+  background: linear-gradient(54.83deg, #6E00E0 8.27%, #FFB461 98.62%);
   background-repeat: no-repeat;
   background-position: center center;
   background-attachment: fixed;
@@ -67,7 +90,8 @@ body{
   display: flex;
   justify-content: space-evenly;
   align-items: center;
-  height: 75px;
+  min-height: 75px;
+  height: max-content;
   background-color: rgba(0, 0, 0, 0.5);
   margin-bottom: 2%;
 }
@@ -95,5 +119,12 @@ body{
 .auth{
   display: flex;
   justify-content: space-around;
+}
+@media (max-width: 500px) {
+  .nav{
+    padding-top: 5%;
+    flex-direction: column;
+    gap: 10px;
+  }
 }
 </style>

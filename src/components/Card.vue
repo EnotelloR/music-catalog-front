@@ -20,14 +20,22 @@ export default {
     card: {
       type: Object,
       default: () => ({})
-    }
+    },
   },
   methods: {
     openCard(){
       this.$store.commit("defineCurrentCard", this.card)
+      if (!this.isLoggedIn){
+        this.$swal({icon: 'warning', titleText: "Для данного действия необходимо авторизоваться в системе!"});
+      }
       this.$router.push("/about-card")
     },
   },
+  computed: {
+    isLoggedIn: function () {
+      return this.$store.getters.isLoggedIn;
+    },
+  }
 };
 </script>
 <style>
@@ -43,11 +51,12 @@ export default {
   filter: drop-shadow(0px 3px 2px rgba(96, 96, 96, 0.35));
   cursor: pointer;
   margin: 0.5%;
+  box-shadow: 8px 8px 7px 3px rgba(34, 60, 80, 0.2);
 }
 .card__text__element{
-  color: #d4d4d4;
+  color: white;
   text-align: left;
-  padding-left: 10px;
+  margin-left: 10px;
 }
 .card_image{
   border-radius: 7px;

@@ -13,7 +13,7 @@
         placeholder="Введите пароль"
       />
       <div>
-        <button class="login__button" type="submit">Войти</button>
+        <button class="typical-button" type="submit">Войти</button>
       </div>
     </form>
   </div>
@@ -33,8 +33,9 @@ export default {
       let grant_type = "password";
       this.$store
         .dispatch("login", { username, password, grant_type })
-        .then(() => this.$router.push("/"))
-        .catch((err) => console.log(err));
+          .then(() => this.$store.dispatch("loadMyPlaylist"))
+          .then(() => this.$router.push("/"))
+          .catch(() => this.$swal({icon: 'error', titleText: "Данный пользователь не найден!"}));
     },
   },
 };
@@ -53,7 +54,7 @@ export default {
 .login-input::placeholder{
   color: grey;
 }
-.login__button{
+.typical-button{
   border: none;
   text-decoration: none;
   outline: none;

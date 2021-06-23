@@ -9,15 +9,25 @@ export default new Vuex.Store({
     status: '',
     access_token: localStorage.getItem('token') || '',
     compositions: [],
-    currentCard: Object
+    compositors: [],
+    genres: [],
+    performers: [],
+    recordCompanies: [],
+    myPlaylist: [],
+    currentCard: Object,
+    backTo: "",
+    userRole: localStorage.getItem("role"),
+    chosenAdminType: "",
+    editingObject: Object,
   },
   mutations: {
     auth_request(state){
       state.status = 'loading'
     },
-    auth_success(state, token){
+    auth_success(state, token, userRole){
       state.status = 'success'
       state.access_token = token
+      state.userRole = userRole
     },
     auth_error(state){
       state.status = 'error'
@@ -25,25 +35,62 @@ export default new Vuex.Store({
     logout(state){
       state.status = ''
       state.access_token = ''
+      state.userRole = ''
+      state.myPlaylist = []
+      state.compositors = []
+      state.genres = []
+      state.performers = []
+      state.recordCompanies = []
     },
     add_compositions(state, compositions){
       state.compositions = compositions
     },
+    add_compositors(state, compositors){
+      state.compositors = compositors
+    },
+    add_genres(state, genres){
+      state.genres = genres
+    },
+    add_performers(state, performers){
+      state.performers = performers
+    },
+    add_recordCompanies(state, recordCompanies){
+      state.recordCompanies = recordCompanies
+    },
+    add_my_playlist(state, myPlaylist){
+      state.myPlaylist = myPlaylist
+    },
     defineCurrentCard(state, card){
       state.currentCard = card
-    }
+    },
+    defineBackTo(state, backTo){
+      state.backTo = backTo
+    },
+    defineAdminType(state, type){
+      state.chosenAdminType = type
+    },
+    defineEditingObject(state, object){
+      state.editingObject = object
+    },
   },
   actions: {
     login({commit}, query_data){
       let qs = require('qs');
       return new Promise((resolve, reject) => {
         commit('auth_request')
-        axios.post('https://localhost:44308/token', qs.stringify(query_data))
+        axios.post(process.env.VUE_APP_API_URL+'/token', qs.stringify(query_data))
         .then(resp => {
           const token = "Bearer " + resp.data.access_token
+          const expiresIn = resp.data.expires_in
+          const role = resp.data.role
+          const ID = resp.data.ID
           localStorage.setItem('token', token)
+          localStorage.setItem('expiresIn', expiresIn)
+          localStorage.setItem('role', role)
+          localStorage.setItem('ID', ID)
+          localStorage.setItem('loginTime', new Date().getTime().toString())
           axios.defaults.headers.common['Authorization'] = token
-          commit('auth_success', token)
+          commit('auth_success', token, role)
           resolve(resp)
         })
         .catch(err => {
@@ -57,30 +104,141 @@ export default new Vuex.Store({
     register({commit}, query_data){
       let qs = require('qs');
       return new Promise((resolve, reject) => {
-        axios.post('https://localhost:44308/api/UserAsAPI', qs.stringify(query_data))
+        axios.post(process.env.VUE_APP_API_URL+'/api/UserAsAPI', qs.stringify(query_data))
             .catch(err => {
               reject(err)
             })
       })
+    },
+    async addToMyPlaylist({getters}){
+      let data = {
+        UserID: localStorage.getItem("ID"),
+        CompositionID: getters.currentCard.ID,
+      }
+      let qs = require('qs');
+      await axios.post(process.env.VUE_APP_API_URL+'/api/PlaylistsAPI', qs.stringify(data))
+    },
+    async addRow({getters}, object){
+      let qs = require('qs');
+      switch (getters.chosenAdminType) {
+        case "compositions":
+          await axios.post(process.env.VUE_APP_API_URL + '/api/CompositionsAPI', qs.stringify(object))
+          break;
+        case "compositors":
+          await axios.post(process.env.VUE_APP_API_URL + '/api/CompositorsAPI', qs.stringify(object))
+          break;
+        case "genres":
+          await axios.post(process.env.VUE_APP_API_URL + '/api/GenresAPI', qs.stringify(object))
+          break;
+        case "performers":
+          await axios.post(process.env.VUE_APP_API_URL + '/api/PerformersAPI', qs.stringify(object))
+          break
+        case "recordCompanies":
+          await axios.post(process.env.VUE_APP_API_URL + '/api/RecordCompaniesAPI', qs.stringify(object))
+          break;
+        default:
+      }
+    },
+    async editRow({getters}, {id, object}){
+      let qs = require('qs');
+      switch (getters.chosenAdminType) {
+        case "compositions":
+          await axios.put(process.env.VUE_APP_API_URL + '/api/CompositionsAPI/'+id, qs.stringify(object))
+          break;
+        case "compositors":
+          await axios.put(process.env.VUE_APP_API_URL + '/api/CompositorsAPI/'+id, qs.stringify(object))
+          break;
+        case "genres":
+          await axios.put(process.env.VUE_APP_API_URL + '/api/GenresAPI/'+id, qs.stringify(object))
+          break;
+        case "performers":
+          await axios.put(process.env.VUE_APP_API_URL + '/api/PerformersAPI/'+id, qs.stringify(object))
+          break
+        case "recordCompanies":
+          await axios.put(process.env.VUE_APP_API_URL + '/api/RecordCompaniesAPI/'+id, qs.stringify(object))
+          break;
+        default:
+      }
+    },
+    async deleteRow({getters}, object){
+      switch (getters.chosenAdminType) {
+        case "compositions":
+          await axios.delete(process.env.VUE_APP_API_URL+'/api/CompositionsAPI/'+object.ID)
+          break;
+        case "compositors":
+          await axios.delete(process.env.VUE_APP_API_URL+'/api/CompositorsAPI/'+object.ID)
+          break;
+        case "genres":
+          await axios.delete(process.env.VUE_APP_API_URL+'/api/GenresAPI/'+object.ID)
+          break;
+        case "performers":
+          await axios.delete(process.env.VUE_APP_API_URL+'/api/PerformersAPI/'+object.ID)
+          break
+        case "recordCompanies":
+          await axios.delete(process.env.VUE_APP_API_URL+'/api/RecordCompaniesAPI/'+object.ID)
+          break;
+        default:
+      }
+    },
+    // eslint-disable-next-line no-unused-vars
+    async deleteFromMyPlaylist({commit, getters}, playlistID){
+      await axios.delete(process.env.VUE_APP_API_URL+'/api/PlaylistsAPI/'+playlistID)
     },
     logout({commit}){
       // eslint-disable-next-line no-unused-vars
       return new Promise((resolve, reject) => {
         commit('logout')
         localStorage.removeItem('token')
+        localStorage.removeItem('expiresIn')
+        localStorage.removeItem('role')
+        localStorage.removeItem('ID')
+        localStorage.removeItem('loginTime')
         delete axios.defaults.headers.common['Authorization']
         resolve()
       })
     },
     async loadCompositions({commit}){
-      await axios.get('https://localhost:44308/api/CompositionsAPI')
+      await axios.get(process.env.VUE_APP_API_URL+'/api/CompositionsAPI')
           .then(resp => {
             commit('add_compositions', resp)
           })
-    }
+    },
+    async loadCompositors({commit}){
+      await axios.get(process.env.VUE_APP_API_URL+'/api/CompositorsAPI')
+          .then(resp => {
+            commit('add_compositors', resp)
+          })
+    },
+    async loadGenres({commit}){
+      await axios.get(process.env.VUE_APP_API_URL+'/api/GenresAPI')
+          .then(resp => {
+            commit('add_genres', resp)
+          })
+    },
+    async loadPerformers({commit}){
+      await axios.get(process.env.VUE_APP_API_URL+'/api/PerformersAPI')
+          .then(resp => {
+            commit('add_performers', resp)
+          })
+    },
+    async loadRecordCompanies({commit}){
+      await axios.get(process.env.VUE_APP_API_URL+'/api/RecordCompaniesAPI')
+          .then(resp => {
+            commit('add_recordCompanies', resp)
+          })
+    },
+    async loadMyPlaylist({commit}){
+      await axios.get(process.env.VUE_APP_API_URL+'/api/GetMyPlaylist')
+          .then(async resp => {
+            await commit('add_my_playlist', resp)
+          })
+    },
   },
   getters : {
     isLoggedIn: state => !!state.access_token,
     authStatus: state => state.status,
+    currentCard: state => state.currentCard,
+    chosenAdminType: state => state.chosenAdminType,
+    userRole: state => state.userRole,
   }
 })

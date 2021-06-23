@@ -28,7 +28,7 @@
       </div>
       <p>Поля, помеченные `*`, обязательны к заполнению</p>
       <div>
-          <button class="register__button" type="submit">Зарегистрироваться</button>
+          <button class="typical-button" type="submit">Зарегистрироваться</button>
       </div>
     </form>
   </div>
@@ -40,7 +40,6 @@
         name : "",
         password : "",
         password_confirmation : "",
-        role: "User",
         fullName: "",
         address: "",
         phoneNum: ""
@@ -48,18 +47,21 @@
     },
     methods: {
       register: function () {
-        let data = {
-          UserName: this.name,
-          UserPassword: this.password,
-          UserRole: this.role,
-          UserFullName: this.fullName,
-          UserAdress: this.address,
-          UserPhoneNumber: this.phoneNum
+        if (this.password !== this.password_confirmation) {
+          this.$swal({icon: 'warning', titleText: "Пароли не совпадают!"});
+        } else {
+          let data = {
+            UserName: this.name,
+            UserPassword: this.password,
+            UserFullName: this.fullName,
+            UserAdress: this.address,
+            UserPhoneNumber: this.phoneNum
+          }
+          this.$store
+              .dispatch('register', data)
+              .then(() => this.$router.push("/login"))
+              .catch(() => this.$swal({icon: 'error', titleText: "Логин уже занят!"}))
         }
-        this.$store
-            .dispatch('register', data)
-       .then(() => this.$router.push("/login"))
-       .catch(err => console.log(err))
       }
     }
   }
@@ -81,7 +83,7 @@ p, label{
 .register-input::placeholder{
   color: grey;
 }
-.register__button{
+.typical-button{
   border: none;
   text-decoration: none;
   outline: none;
