@@ -15,25 +15,25 @@
   </div>
 </template>
 <script>
+import store from '/src/store/store';
 export default {
   name: "App",
   created: function () {
     this.$http.interceptors.response.use(function (response) {
       return response
-    }, function (error) {
-      let error_json = JSON.stringify(error.response)
-      if (error_json.status === 401) {
-        this.$store.dispatch("logout");
+    }, async function (error) {
+      if (error.response.status === 401) {
+        await store.dispatch("logout");
       }
       return Promise.reject(error)
-    })
+    });
     this.$store.dispatch("loadCompositions");
+    this.$store.dispatch("loadGenres");
     if (this.isLoggedIn){
       this.$store.dispatch("loadMyPlaylist");
     }
     if (this.userRole === "Admin"){
       this.$store.dispatch("loadCompositors");
-      this.$store.dispatch("loadGenres");
       this.$store.dispatch("loadPerformers");
       this.$store.dispatch("loadRecordCompanies");
     }

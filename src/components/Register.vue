@@ -1,33 +1,33 @@
 <template>
-  <div>
-    <h1>Регистрация</h1>
-    <form @submit.prevent="register">
-      <label for="name">Логин *</label>
-      <div>
-          <input class="register-input" id="name" type="text" v-model="name" required autofocus>
+  <div class="register">
+    <h1 class="register-title">Регистрация</h1>
+    <form class="register__holder" @submit.prevent="register">
+      <label class="register__holder__label" for="name">Логин *</label>
+      <div class="register__holder">
+          <input class="register__holder__input" id="name" type="text" v-model="name" required autofocus>
       </div>
-      <label for="password">Пароль *</label>
-      <div>
-          <input class="register-input" id="password" type="password" v-model="password" required>
+      <label class="register__holder__label" for="password">Пароль *</label>
+      <div class="register__holder">
+          <input class="register__holder__input" id="password" type="password" v-model="password" required>
       </div>
-      <label for="password-confirm">Подтвердите Пароль *</label>
-      <div>
-          <input class="register-input" id="password-confirm" type="password" v-model="password_confirmation" required>
+      <label class="register__holder__label" for="password-confirm">Подтвердите Пароль *</label>
+      <div class="register__holder">
+          <input class="register__holder__input" id="password-confirm" type="password" v-model="password_confirmation" required>
       </div>
-      <label for="FullName" >ФИО</label>
-      <div>
-        <input class="register-input" id="FullName" type="text" v-model="fullName">
+      <label class="register__holder__label" for="FullName" >ФИО</label>
+      <div class="register__holder">
+        <input class="register__holder__input" id="FullName" type="text" v-model="fullName">
       </div>
-      <label for="Address" >Адрес</label>
-      <div>
-        <input class="register-input" id="Address" type="text" v-model="address" >
+      <label class="register__holder__label" for="Address" >Адрес</label>
+      <div class="register__holder">
+        <input class="register__holder__input" id="Address" type="text" v-model="address" >
       </div>
-      <label for="PhoneNum" >Номер телефона</label>
-      <div>
-        <input class="register-input" id="PhoneNum" type="text" v-model="phoneNum">
+      <label class="register__holder__label" for="PhoneNum" >Номер телефона</label>
+      <div class="register__holder">
+        <input class="register__holder__input" id="PhoneNum" type="text" v-model="phoneNum">
       </div>
-      <p>Поля, помеченные `*`, обязательны к заполнению</p>
-      <div>
+      <p class="register__holder__label">Поля, помеченные `*`, обязательны к заполнению</p>
+      <div class="register__holder">
           <button class="typical-button" type="submit">Зарегистрироваться</button>
       </div>
     </form>
@@ -46,7 +46,7 @@
       }
     },
     methods: {
-      register: function () {
+      async register() {
         if (this.password !== this.password_confirmation) {
           this.$swal({icon: 'warning', titleText: "Пароли не совпадают!"});
         } else {
@@ -57,9 +57,8 @@
             UserAdress: this.address,
             UserPhoneNumber: this.phoneNum
           }
-          this.$store
-              .dispatch('register', data)
-              .then(() => this.$router.push("/login"))
+          await this.$store
+              .dispatch('register', data).then(() => this.$swal({icon: 'success', titleText: "Регистрация прошла успешно!"}))
               .catch(() => this.$swal({icon: 'error', titleText: "Логин уже занят!"}))
         }
       }
@@ -67,10 +66,10 @@
   }
 </script>
 <style>
-p, label{
+.register__holder__label, .register-title{
   color: white;
 }
-.register-input{
+.register__holder__input{
   font-size: 16px;
   padding: 10px;
   width: 300px;
@@ -80,7 +79,7 @@ p, label{
   background-color: rgba(0, 0, 0, 0.5);
   color: white;
 }
-.register-input::placeholder{
+.register__holder__input::placeholder{
   color: grey;
 }
 .typical-button{

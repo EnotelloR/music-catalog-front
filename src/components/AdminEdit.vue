@@ -47,7 +47,6 @@
       <div class="input-holder__element">
         <p class="input-holder__element__label"><label for="compositor_c">Композитор</label></p>
         <select required class="input-holder__element__input-field" id="compositor_c" v-model="compositorID">
-          <option selected value=0>Не выбран</option>
           <option
               v-for="compositor in compositors"
               :key="compositor.ID"
@@ -59,7 +58,6 @@
       <div class="input-holder__element">
         <p class="input-holder__element__label"><label for="recordCompany_c">Звукозаписывающая компания</label></p>
         <select required class="input-holder__element__input-field" id="recordCompany_c" v-model="recordCompanyID">
-          <option selected value=0>Не выбран</option>
           <option
               v-for="recordCompany in recordCompanies"
               :key="recordCompany.ID"
@@ -130,7 +128,7 @@ export default {
         this.compositorID = row.CompositorID
         this.recordCompanyID = row.RecordCompanyID
         this.media_type = row.MediaType
-        this.date = row.RecordDate
+        this.date = this.parsedDate(new Date(row.RecordDate))
         this.duration = row.Duration
         this.views = row.Views
         this.img_url = row.ImgUrl
@@ -226,6 +224,22 @@ export default {
     },
     pushBack() {
       this.$router.push("/admin-rows")
+    },
+    parsedDate(date){
+      if (date == null){
+        return null;
+      }
+      let dd = date.getDate();
+      let mm = date.getMonth() + 1;
+      let yyyy = date.getFullYear();
+      if(dd < 10){
+        dd='0' + dd
+      }
+      if(mm < 10){
+        mm='0' + mm
+      }
+      date = yyyy + '-' + mm + '-' + dd;
+      return date
     },
   },
   computed: {

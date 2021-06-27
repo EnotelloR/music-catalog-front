@@ -19,5 +19,6 @@
 }
 .main-text__element{
   font-size: 26px;
+  color: white;
 }
 </style>

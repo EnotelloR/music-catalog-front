@@ -104,7 +104,9 @@ export default new Vuex.Store({
     register({commit}, query_data){
       let qs = require('qs');
       return new Promise((resolve, reject) => {
-        axios.post(process.env.VUE_APP_API_URL+'/api/UserAsAPI', qs.stringify(query_data))
+        axios.post(process.env.VUE_APP_API_URL+'/api/UserAsAPI', qs.stringify(query_data)).then(resp =>{
+          resolve(resp)
+        })
             .catch(err => {
               reject(err)
             })
@@ -161,23 +163,37 @@ export default new Vuex.Store({
       }
     },
     async deleteRow({getters}, object){
+      let requestString = "";
       switch (getters.chosenAdminType) {
         case "compositions":
-          await axios.delete(process.env.VUE_APP_API_URL+'/api/CompositionsAPI/'+object.ID)
+          requestString = '/api/CompositionsAPI/'+object.ID;
           break;
         case "compositors":
-          await axios.delete(process.env.VUE_APP_API_URL+'/api/CompositorsAPI/'+object.ID)
+          requestString = '/api/CompositorsAPI/'+object.ID
           break;
         case "genres":
-          await axios.delete(process.env.VUE_APP_API_URL+'/api/GenresAPI/'+object.ID)
+          requestString = '/api/GenresAPI/'+object.ID
           break;
         case "performers":
-          await axios.delete(process.env.VUE_APP_API_URL+'/api/PerformersAPI/'+object.ID)
+          requestString = '/api/PerformersAPI/'+object.ID
           break
         case "recordCompanies":
-          await axios.delete(process.env.VUE_APP_API_URL+'/api/RecordCompaniesAPI/'+object.ID)
+          requestString = '/api/RecordCompaniesAPI/'+object.ID
           break;
         default:
+      }
+      if (requestString !== ""){
+        let returnValue;
+        await axios.delete(process.env.VUE_APP_API_URL+requestString).then(() => returnValue = true).catch(function (error) {
+          if (error.response.status === 400) {
+            returnValue = false;
+          } else if (error.request) {
+            console.log(error.request);
+          } else {
+            console.log('Error', error.message);
+          }
+        });
+        return returnValue;
       }
     },
     // eslint-disable-next-line no-unused-vars

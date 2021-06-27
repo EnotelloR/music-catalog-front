@@ -62,4 +62,20 @@ export default {
   border-radius: 7px;
   width: 190px;
 }
+@media print {
+  .card{
+    padding: 40px;
+    break-inside: avoid;
+    width: 100%;
+    height: 150px;
+    margin: 0 auto 10% 15%;
+    text-align: center;
+  }
+  .card__text__element{
+    font-size: 16px;
+  }
+  .card_image{
+    width: 220px;
+  }
+}
 </style>

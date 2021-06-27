@@ -47,7 +47,6 @@
       <div class="input-holder__element">
         <p class="input-holder__element__label"><label for="compositor_c">Композитор</label></p>
         <select required class="input-holder__element__input-field" id="compositor_c" v-model="compositorID">
-          <option selected value=0>Не выбран</option>
           <option
               v-for="compositor in compositors"
               :key="compositor.ID"
@@ -59,7 +58,6 @@
       <div class="input-holder__element">
         <p class="input-holder__element__label"><label for="recordCompany_c">Звукозаписывающая компания</label></p>
         <select required class="input-holder__element__input-field" id="recordCompany_c" v-model="recordCompanyID">
-          <option selected value=0>Не выбран</option>
           <option
               v-for="recordCompany in recordCompanies"
               :key="recordCompany.ID"
@@ -122,7 +120,9 @@ export default {
   methods: {
     async addRow() {
       let object = this.createObject();
-      this.$store.dispatch("addRow", object).then(async () => await this.updateData).then(() => this.$swal.fire('Успех!', 'Запись успешно добавлена.', 'success')).then(this.pushBack);
+      this.$store.dispatch("addRow", object).
+      then(async () => await this.updateData).
+      then(() => this.$swal.fire('Успех!', 'Запись успешно добавлена.', 'success')).then(this.pushBack);
     },
     createObject() {
       let object;
@@ -267,6 +267,9 @@ export default {
   border-bottom: 1px solid #ccc;
   border-radius: 10px;
   background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+}
+.input-holder__element__label{
   color: white;
 }
 </style>

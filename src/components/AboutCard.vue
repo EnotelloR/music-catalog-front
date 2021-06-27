@@ -4,27 +4,27 @@
       <img class="about-card__element__img" :src="card.ImgUrl" alt="Лого картинки" draggable="false">
     </div>
     <div class="about-card__element">
-      <p>Название композиции:</p>
-      <p>{{this.card.CompositionName}}</p>
+      <p class="about-card__element__text">Название композиции:</p>
+      <p class="about-card__element__text">{{this.card.CompositionName}}</p>
     </div>
     <div class="about-card__element">
-      <p>Жанр:</p>
-      <p>{{this.card.Genre.GenreName}}</p>
-      <p>{{this.card.Genre.GenreDescription}}</p>
+      <p class="about-card__element__text">Жанр:</p>
+      <p class="about-card__element__text">{{this.card.Genre.GenreName}}</p>
+      <p class="about-card__element__text">{{this.card.Genre.GenreDescription}}</p>
     </div>
     <div class="about-card__element">
-      <p>Исполнитель:</p>
-      <p>{{this.card.Performer.PerformerName}}</p>
-      <p>Состав:</p>
-      <p>{{this.card.Performer.PerformerMembers}}</p>
+      <p class="about-card__element__text">Исполнитель:</p>
+      <p class="about-card__element__text">{{this.card.Performer.PerformerName}}</p>
+      <p class="about-card__element__text">Состав:</p>
+      <p class="about-card__element__text">{{this.card.Performer.PerformerMembers}}</p>
     </div>
     <div class="about-card__element">
-      <p>Звукозаписывающая компания:</p>
-      <p>{{this.card.RecordCompany.RecordCompanyName}} : {{this.card.RecordCompany.RecordCompanyAdress}}</p>
+      <p class="about-card__element__text">Звукозаписывающая компания:</p>
+      <p class="about-card__element__text">{{this.card.RecordCompany.RecordCompanyName}} : {{this.card.RecordCompany.RecordCompanyAdress}}</p>
     </div>
     <div class="about-card__element">
-      <p>Композитор:</p>
-      <p>{{this.card.Compositor.CompositorName}} : {{this.card.Compositor.CompositorCountry}}</p>
+      <p class="about-card__element__text">Композитор:</p>
+      <p class="about-card__element__text">{{this.card.Compositor.CompositorName}} : {{this.card.Compositor.CompositorCountry}}</p>
     </div>
     <div class="button-holder">
       <button class="typical-button" @click="backwards">Назад</button>
@@ -115,6 +115,9 @@ export default {
 .about-card__element__img{
   width: 190px;
   border-radius: 7px;
+}
+.about-card__element__text{
+  color: white;
 }
 @media (max-width: 700px) {
   .button-holder{

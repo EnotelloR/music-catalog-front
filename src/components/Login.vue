@@ -1,12 +1,12 @@
 <template>
   <div>
     <form class="login" @submit.prevent="login">
-      <h1>Поле входа</h1>
-      <p><label>Логин</label></p>
-      <input class="login-input" required v-model="username" placeholder="Введите логин" />
-      <p><label>Пароль</label></p>
+      <h1 class="login-title">Поле входа</h1>
+      <p class="login__desc"><label>Логин</label></p>
+      <input class="login__input" required v-model="username" placeholder="Введите логин" />
+      <p class="login__desc"><label>Пароль</label></p>
       <input
-          class="login-input"
+          class="login__input"
           required
         v-model="password"
         type="password"
@@ -41,7 +41,7 @@ export default {
 };
 </script>
 <style>
-.login-input{
+.login__input{
   font-size: 16px;
   padding: 10px;
   width: 300px;
@@ -51,7 +51,10 @@ export default {
   background-color: rgba(0, 0, 0, 0.5);
   color: white;
 }
-.login-input::placeholder{
+.login-title, .login__desc{
+  color: white;
+}
+.login__input::placeholder{
   color: grey;
 }
 .typical-button{
