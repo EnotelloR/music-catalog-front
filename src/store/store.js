@@ -19,6 +19,7 @@ export default new Vuex.Store({
     userRole: localStorage.getItem("role"),
     chosenAdminType: "",
     editingObject: Object,
+    mostPopularTracks: [],
   },
   mutations: {
     auth_request(state){
@@ -72,12 +73,16 @@ export default new Vuex.Store({
     defineEditingObject(state, object){
       state.editingObject = object
     },
+    defineMostPopularTracks(state, object){
+      state.mostPopularTracks = object
+    },
   },
   actions: {
     login({commit}, query_data){
       let qs = require('qs');
       return new Promise((resolve, reject) => {
         commit('auth_request')
+        console.log(qs.stringify(query_data))
         axios.post(process.env.VUE_APP_API_URL+'/token', qs.stringify(query_data))
         .then(resp => {
           const token = "Bearer " + resp.data.access_token
@@ -247,6 +252,12 @@ export default new Vuex.Store({
       await axios.get(process.env.VUE_APP_API_URL+'/api/GetMyPlaylist')
           .then(async resp => {
             await commit('add_my_playlist', resp)
+          })
+    },
+    async loadMostPopularTracks({commit}){
+      await axios.get(process.env.VUE_APP_API_URL+'/api/GetTopPlaylist')
+          .then(async resp => {
+            await commit('defineMostPopularTracks', resp)
           })
     },
   },

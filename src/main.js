@@ -15,6 +15,10 @@ const swalOptions = {
 
 Vue.use(VueSweetalert2, swalOptions)
 
+import Donut from 'vue-css-donut-chart';
+import 'vue-css-donut-chart/dist/vcdonut.css';
+Vue.use(Donut);
+
 Vue.prototype.$http = Axios;
 const token = localStorage.getItem('token')
 if (token) {

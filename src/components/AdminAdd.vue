@@ -92,7 +92,7 @@
                placeholder="Введите данные">
       </div>
       <div class="buttons-holder">
-        <button type="submit" required class="typical-button">Добавить</button>
+        <button type="submit" class="typical-button">Добавить</button>
       </div>
     </form>
     <button class="typical-button" @click="pushBack">Назад</button>
