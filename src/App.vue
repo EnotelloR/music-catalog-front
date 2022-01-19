@@ -5,6 +5,7 @@
       <router-link class="nav__item" to="/card-holder"> Каталог </router-link>
       <router-link class="nav__item" v-if="isLoggedIn" to="/playlist"> Мой Плейлист </router-link>
       <router-link class="nav__item" v-if="userRole === 'Admin'" to="/admin-place"> Админка </router-link>
+      <router-link class="nav__item" v-if="isLoggedIn" to="/personal-cabinet"> Личный кабинет </router-link>
       <div class="nav__item auth">
         <router-link class="auth__item" v-if="!isLoggedIn" to="/login"> Войти </router-link>
         <router-link class="auth__item" v-if="!isLoggedIn" to="/register"> Регистрация </router-link>

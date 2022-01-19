@@ -11,6 +11,7 @@ import AdminPlace from '../components/AdminPlace.vue'
 import AdminRows from '../components/AdminRows.vue'
 import AdminAdd from '../components/AdminAdd.vue'
 import AdminEdit from '../components/AdminEdit.vue'
+import PersonalCabinet from "@/components/PersonalCabinet";
 
 Vue.use(Router)
 
@@ -44,6 +45,15 @@ let router = new Router({
       path: '/playlist',
       username: 'playlist',
       component: PlaylistHolder,
+      meta: {
+        requiresAuth: true
+      }
+    },
+
+    {
+      path: '/personal-cabinet',
+      username: 'personal-cabinet',
+      component: PersonalCabinet,
       meta: {
         requiresAuth: true
       }

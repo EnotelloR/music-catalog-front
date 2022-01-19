@@ -17,7 +17,7 @@
             background="gray"
             :sections="dataCollection"
             has-legend
-            thickness="100"
+            thickness=100
             :total="dataCollectionSum"></vc-donut>
       </div>
     </div>

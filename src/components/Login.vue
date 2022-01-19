@@ -27,7 +27,7 @@ export default {
     };
   },
   methods: {
-    login: function () {
+    login () {
       let username = this.username;
       let password = this.password;
       let grant_type = "password";
@@ -40,7 +40,7 @@ export default {
   },
 };
 </script>
-<style>
+<style scoped>
 .login__input{
   font-size: 16px;
   padding: 10px;

@@ -42,6 +42,7 @@ export default new Vuex.Store({
       state.genres = []
       state.performers = []
       state.recordCompanies = []
+      state.userID = ''
     },
     add_compositions(state, compositions){
       state.compositions = compositions
@@ -82,7 +83,6 @@ export default new Vuex.Store({
       let qs = require('qs');
       return new Promise((resolve, reject) => {
         commit('auth_request')
-        console.log(qs.stringify(query_data))
         axios.post(process.env.VUE_APP_API_URL+'/token', qs.stringify(query_data))
         .then(resp => {
           const token = "Bearer " + resp.data.access_token
@@ -106,7 +106,18 @@ export default new Vuex.Store({
       })
     },
     // eslint-disable-next-line no-unused-vars
-    register({commit}, query_data){
+    changePassword({commit}, query_data){
+      return new Promise((resolve, reject) => {
+        axios.put(process.env.VUE_APP_API_URL+'/api/ChangePassword', null, {params: query_data})
+        .then(resp => {
+          resolve(resp)
+        })
+        .catch(err => {
+          reject(err)
+        })
+      })
+    },
+    register(query_data){
       let qs = require('qs');
       return new Promise((resolve, reject) => {
         axios.post(process.env.VUE_APP_API_URL+'/api/UserAsAPI', qs.stringify(query_data)).then(resp =>{
