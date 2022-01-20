@@ -108,7 +108,15 @@ router.beforeEach((to, from, next) => {
   }
   else if(to.matched.some(record => record.meta.requiresAdminRole)){
     let role = localStorage.getItem("role");
-    if (role === 'Admin') {
+    if (role === 'Admin' || role === 'MainAdmin') {
+      next()
+      return
+    }
+    next('/login')
+  }
+  else if(to.matched.some(record => record.meta.requiresMainAdminRole)){
+    let role = localStorage.getItem("role");
+    if (role === 'MainAdmin') {
       next()
       return
     }

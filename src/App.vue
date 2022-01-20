@@ -3,8 +3,6 @@
     <div class="nav">
       <router-link class="nav__item" to="/">Главная</router-link>
       <router-link class="nav__item" to="/card-holder"> Каталог </router-link>
-      <router-link class="nav__item" v-if="isLoggedIn" to="/playlist"> Мой Плейлист </router-link>
-      <router-link class="nav__item" v-if="userRole === 'Admin'" to="/admin-place"> Админка </router-link>
       <router-link class="nav__item" v-if="isLoggedIn" to="/personal-cabinet"> Личный кабинет </router-link>
       <div class="nav__item auth">
         <router-link class="auth__item" v-if="!isLoggedIn" to="/login"> Войти </router-link>
@@ -37,6 +35,10 @@ export default {
       this.$store.dispatch("loadCompositors");
       this.$store.dispatch("loadPerformers");
       this.$store.dispatch("loadRecordCompanies");
+    }
+    if (this.userRole === "MainAdmin"){
+      this.$store.dispatch("loadAdmins");
+      this.$store.dispatch("loadNotAdmins");
     }
     if (!this.isTokenValid){
       this.$store.dispatch("logout");

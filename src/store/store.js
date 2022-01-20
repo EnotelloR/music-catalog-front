@@ -20,6 +20,8 @@ export default new Vuex.Store({
     chosenAdminType: "",
     editingObject: Object,
     mostPopularTracks: [],
+    admins: [],
+    notAdmins: []
   },
   mutations: {
     auth_request(state){
@@ -74,8 +76,14 @@ export default new Vuex.Store({
     defineEditingObject(state, object){
       state.editingObject = object
     },
-    defineMostPopularTracks(state, object){
+    addMostPopularTracks(state, object){
       state.mostPopularTracks = object
+    },
+    addAdmins(state, object){
+      state.admins = object
+    },
+    addNotAdmins(state, object){
+      state.notAdmins = object
     },
   },
   actions: {
@@ -150,10 +158,12 @@ export default new Vuex.Store({
           break;
         case "performers":
           await axios.post(process.env.VUE_APP_API_URL + '/api/PerformersAPI', qs.stringify(object))
-          break
+          break;
         case "recordCompanies":
           await axios.post(process.env.VUE_APP_API_URL + '/api/RecordCompaniesAPI', qs.stringify(object))
           break;
+        case "admins":
+          return await axios.put(process.env.VUE_APP_API_URL + '/api/AddAdmin/', null, {params: {id: Number(object.ID)}})
         default:
       }
     },
@@ -192,16 +202,31 @@ export default new Vuex.Store({
           break;
         case "performers":
           requestString = '/api/PerformersAPI/'+object.ID
-          break
+          break;
         case "recordCompanies":
           requestString = '/api/RecordCompaniesAPI/'+object.ID
           break;
+        case "admins":
+          requestString = '/api/DeleteAdmin/'
+          break;
         default:
       }
-      if (requestString !== ""){
-        let returnValue;
+      let returnValue;
+      if (requestString !== "" && getters.chosenAdminType !== "admins"){
         await axios.delete(process.env.VUE_APP_API_URL+requestString).then(() => returnValue = true).catch(function (error) {
           if (error.response.status === 400) {
+            returnValue = false;
+          } else if (error.request) {
+            console.log(error.request);
+          } else {
+            console.log('Error', error.message);
+          }
+        });
+        return returnValue;
+      }
+      else if(getters.chosenAdminType === "admins") {
+        await axios.put(process.env.VUE_APP_API_URL+requestString, null, {params: {id: object.ID}}).then(() => returnValue = true).catch(function (error) {
+          if (error.response.status === 200) {
             returnValue = false;
           } else if (error.request) {
             console.log(error.request);
@@ -268,7 +293,19 @@ export default new Vuex.Store({
     async loadMostPopularTracks({commit}){
       await axios.get(process.env.VUE_APP_API_URL+'/api/GetTopPlaylist')
           .then(async resp => {
-            await commit('defineMostPopularTracks', resp)
+            await commit('addMostPopularTracks', resp)
+          })
+    },
+    async loadAdmins({commit}){
+      await axios.get(process.env.VUE_APP_API_URL+'/api/GetAdmins')
+          .then(async resp => {
+            await commit('addAdmins', resp)
+          })
+    },
+    async loadNotAdmins({commit}){
+      await axios.get(process.env.VUE_APP_API_URL+'/api/GetNotAdmins')
+          .then(async resp => {
+            await commit('addNotAdmins', resp)
           })
     },
   },

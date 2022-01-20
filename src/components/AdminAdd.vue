@@ -1,6 +1,14 @@
 <template>
   <div id="AdminAdd" class="admin-add">
-    <form class="input-holder input-holder_small" v-if="getType !== 'compositions'" @submit.prevent="addRow">
+    <div class="input-holder input-holder_small" v-if="getType === 'admins'">
+      <AdminRow
+          v-for="element in notAdmins"
+          :key="element.ID"
+          :row = element
+          :type = "'notAdmins'"
+      ></AdminRow>
+    </div>
+    <form class="input-holder input-holder_small" v-else-if="getType !== 'compositions' || getType !== 'admins'" @submit.prevent="addRow">
       <div class="input-holder__element">
         <p class="input-holder__element__label"><label for="name">{{ this.nameLabel }}</label></p>
         <input required class="input-holder__element__input-field" id="name" v-model="name" type="text"
@@ -16,7 +24,7 @@
         <button type="submit" class="typical-button">Добавить</button>
       </div>
     </form>
-    <form class="input-holder" v-else @submit.prevent="addRow">
+    <form class="input-holder" v-if="getType === 'compositions'" @submit.prevent="addRow">
       <div class="input-holder__element">
         <p class="input-holder__element__label"><label for="name_c">{{ this.nameLabel }}</label></p>
         <input required class="input-holder__element__input-field" id="name_c" v-model="name" type="text"
@@ -99,8 +107,11 @@
   </div>
 </template>
 <script>
-
+import AdminRow from "@/components/AdminRow";
 export default {
+  components: {
+    AdminRow
+  },
   name: "AdminAdd",
   data() {
     return {
@@ -180,6 +191,8 @@ export default {
         this.$store.dispatch("loadRecordCompanies");
       } else if (this.getType === "compositions") {
         this.$store.dispatch("loadCompositions");
+      } else if (this.getType === "admins") {
+        this.$store.dispatch("loadNotAdmins");
       }
     },
     pushBack() {
@@ -216,6 +229,8 @@ export default {
         return "Адрес";
       } else if (this.getType === "compositions") {
         return "Вид носителя";
+      } else if(this.getType === "admins"){
+        return null;
       } else {
         this.pushBack();
         return "";
@@ -233,6 +248,9 @@ export default {
     recordCompanies() {
       return this.$store.state.recordCompanies.data;
     },
+    notAdmins(){
+      return this.$store.state.notAdmins.data;
+    }
   }
 };
 </script>

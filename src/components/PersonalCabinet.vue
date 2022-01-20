@@ -25,13 +25,15 @@
     </form>
   </div>
   <div class="playlist">
-    <router-link class="nav__item" to="/playlist"> Мой Плейлист </router-link>
+    <div class="admin-holder__element"><button class="typical-button"><router-link class="nav__item" to="/playlist"> Мой Плейлист </router-link></button></div>
   </div>
-  <div class="admin-place">
-    <router-link class="nav__item" v-if="userRole === 'Admin'" to="/admin-place"> Админка </router-link>
+  <div v-show="userRole === 'MainAdmin' || userRole === 'Admin'" class="admin-place">
+    <div class="admin-holder__element">
+      <button class="typical-button">    <router-link class="nav__item" v-if="userRole === 'Admin' || userRole === 'MainAdmin'" to="/admin-place"> Админка </router-link>
+    </button></div>
   </div>
-  <div v-if="userRole === 'mainAdmin'" class="main-admin-place">
-    <router-link class="nav__item" to="/main-admin-place"> Главная админка </router-link>
+  <div v-show="userRole === 'MainAdmin'" class="main-admin-place">
+    <div class="admin-holder__element"><button class="typical-button" @click="openEditor('admins')">Редактировать список администраторов</button></div>
   </div>
 </div>
 </template>
@@ -53,6 +55,10 @@ name: "PersonalCabinet",
           .dispatch("changePassword", { oldPassword, newPassword })
           .then(() => this.$swal({icon: 'success', titleText: "Пароль успешно изменён!"}))
           .catch(() => this.$swal({icon: 'error', titleText: "Неверный пароль!"}));
+    },
+    openEditor(type) {
+      this.$store.commit("defineAdminType", type)
+      this.$router.push("/admin-rows")
     },
   },
   computed: {
@@ -94,5 +100,8 @@ name: "PersonalCabinet",
   box-shadow: 0 0 40px 40px #f137a6 inset, 0 0 0 0 #f137a6;
   transition: 150ms ease-in-out;
   cursor: pointer;
+}
+.nav__item{
+  text-decoration: none;
 }
 </style>

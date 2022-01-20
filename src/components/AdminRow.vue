@@ -2,15 +2,18 @@
   <div id="AdminRow" class="row">
     <p class="row__element row__element_id">ID: {{ row.ID }}</p>
     <p class="row__element row__element_text">Имя: {{ rowText }}</p>
-    <div class="row__element row__element_clickable" @click="editRow">
-      <svg xmlns="http://www.w3.org/2000/svg" width="2vw" viewBox="0 0 24 24" fill="none" stroke="white"
+    <div v-show="notAnyAdminType" class="row__element row__element_clickable" @click="editRow">
+      <svg xmlns="http://www.w3.org/2000/svg" width="2em" viewBox="0 0 24 24" fill="none" stroke="white"
            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit">
         <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path>
         <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon>
       </svg>
     </div>
-    <div class="row__element row__element_clickable" @click="deleteRow">
-      <svg xmlns="http://www.w3.org/2000/svg" width="2vw" data-name="Layer 1" viewBox="0 0 64 64">
+    <div v-if="type === 'notAdmins'" class="row__element row__element_clickable" @click="makeAdmin">
+      Добавить администратора
+    </div>
+    <div v-show="this.type !== 'notAdmins'" class="row__element row__element_clickable" @click="deleteRow">
+      <svg xmlns="http://www.w3.org/2000/svg" width="2em" data-name="Layer 1" viewBox="0 0 64 64">
         <line x1="9.37" x2="54.63" y1="9.37" y2="54.63" fill="none" stroke="white" stroke-miterlimit="10"
               stroke-width="4"/>
         <line x1="9.37" x2="54.63" y1="54.63" y2="9.37" fill="none" stroke="white" stroke-miterlimit="10"
@@ -24,6 +27,7 @@
 export default {
   name: "AdminRow",
   props: {
+    type: String,
     row: {
       type: Object,
       default: () => ({})
@@ -70,14 +74,50 @@ export default {
         this.$store.dispatch("loadRecordCompanies");
       } else if (this.getType === "compositions") {
         this.$store.dispatch("loadCompositions");
+      } else if (this.type === "notAdmins") {
+        this.$store.dispatch("loadNotAdmins");
+      }else if (this.getType === "admins") {
+        this.$store.dispatch("loadAdmins");
       }
+    },
+    makeAdmin(){
+      this.$swal.fire({
+        title: 'Вы уверены, что хотите сделать ' + this.rowText + ' администратором?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Да',
+        cancelButtonText: 'Отмена',
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          let result = await this.$store.dispatch("addRow", this.row)
+          if (result) {
+            await this.$swal.fire(
+                'Добавлен!',
+                'В системе появился новый администратор.',
+                'success'
+            )
+            this.updateData();
+          } else {
+            await this.$swal.fire(
+                'Ошибка!',
+                'Невозможно сделать данного пользователя администратором.',
+                'error'
+            )
+          }
+        }
+      })
     },
     editRow() {
       this.$store.commit("defineEditingObject", this.row);
       this.$router.push("/admin-edit")
     },
     pushBack() {
-      this.$router.push("/admin-place")
+      if (!this.notAnyAdminType) {
+        this.$router.push("/personal-cabinet")
+      } else
+        this.$router.push("/admin-place")
     },
   },
   computed: {
@@ -98,10 +138,15 @@ export default {
         return this.row.PerformerName;
       } else if (this.getType === "recordCompanies") {
         return this.row.RecordCompanyName;
+      } else if (this.getType === "admins" || this.getType === "notAdmins") {
+        return this.row.UserName;
       } else {
         return null;
       }
     },
+    notAnyAdminType(){
+      return this.getType !== "admins" && this.type !== 'notAdmins'
+    }
   }
 };
 </script>

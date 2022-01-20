@@ -31,7 +31,10 @@ export default {
       this.addText = addText;
     },
     pushBack(){
-      this.$router.push("/admin-place")
+      if (this.getType === 'MainAdmin')
+        this.$router.push("/admin-place")
+      else
+        this.$router.push("personal-cabinet")
     },
     openAdd(){
       this.$router.push("/admin-add")
@@ -42,6 +45,8 @@ export default {
       await this.$store.dispatch("loadPerformers");
       await this.$store.dispatch("loadRecordCompanies");
       await this.$store.dispatch("loadCompositions");
+      await this.$store.dispatch("loadAdmins");
+      await this.$store.dispatch("loadNotAdmins");
     }
   },
   computed: {
@@ -71,6 +76,10 @@ export default {
       else if(this.getType === "recordCompanies"){
         this.setText("Звукозаписывающие компании", "Добавить звукозаписывающую компанию");
         return this.$store.state.recordCompanies.data;
+      }
+      else if(this.getType === "admins"){
+        this.setText("Администраторы", "Добавить администратора");
+        return this.$store.state.admins.data;
       }
       else{
         this.setText("", "");
